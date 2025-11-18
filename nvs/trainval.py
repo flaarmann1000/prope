@@ -295,7 +295,8 @@ class LVSMLauncher(Launcher):
             # print("forward mean/std - post sigmoid:", outputs.mean().item(), outputs.std().item()) 
             # mse = F.mse_loss(outputs, tar_imgs)
             
-            mse = F.mse_loss(outputs.float(), tar_imgs.float())
+            # mse = F.mse_loss(outputs.float(), tar_imgs.float())            
+            mse = F.l1_loss(outputs.float(), tar_imgs.float())            
             # print(f"mse: {mse}")
 
             # amp = 100.0
