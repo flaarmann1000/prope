@@ -153,8 +153,8 @@ class LVSMLauncher(Launcher):
 
         ref_imgs = images[:, :input_views]
         tar_imgs = images[:, input_views:]
-        print("ref_imgs", ref_imgs.min().item(), ref_imgs.max().item(),
-            ref_imgs.mean().item(), ref_imgs.std().item())
+        # print("ref_imgs", ref_imgs.min().item(), ref_imgs.max().item(),
+        #     ref_imgs.mean().item(), ref_imgs.std().item())
         
         ref_cams = Camera(
             K=Ks[:, :input_views],
@@ -196,7 +196,7 @@ class LVSMLauncher(Launcher):
         dataloader = torch.utils.data.DataLoader(
             dataset,
             batch_size=self.config.dataset_batch_scenes,
-            num_workers=4,
+            num_workers=4,            
             pin_memory=True,
             persistent_workers=True,
         )
@@ -290,13 +290,15 @@ class LVSMLauncher(Launcher):
         with torch.amp.autocast("cuda", enabled=self.config.amp, dtype=self.amp_dtype):
                         
             outputs = model(ref_imgs, ref_cams, tar_cams)
-            print("forward mean/std - pre sigmoid:", outputs.mean().item(), outputs.std().item()) 
+            # print("forward mean/std - pre sigmoid:", outputs.mean().item(), outputs.std().item()) 
             # outputs = torch.sigmoid(outputs)
             # print("forward mean/std - post sigmoid:", outputs.mean().item(), outputs.std().item()) 
             # mse = F.mse_loss(outputs, tar_imgs)
             
-            # mse = F.mse_loss(outputs.float(), tar_imgs.float())            
-            mse = F.l1_loss(outputs.float(), tar_imgs.float())            
+            mse = F.mse_loss(outputs.float(), tar_imgs.float())            
+            # mse = F.l1_loss(outputs.float(), tar_imgs.float()) 
+
+            # mse = (1 - state["ssim_fn"](outputs, tar_imgs))*0.1 + F.mse_loss(outputs.float(), tar_imgs.float())
             # print(f"mse: {mse}")
 
             # amp = 100.0
@@ -388,7 +390,8 @@ class LVSMLauncher(Launcher):
             dataloaders[f"zoom{zoom_factor}"] = (
                 self.config.test_input_views,
                 torch.utils.data.DataLoader(
-                    dataset, batch_size=1, num_workers=2, pin_memory=True
+                    # dataset, batch_size=1, num_workers=2, pin_memory=True
+                    dataset, batch_size=1, num_workers=1, pin_memory=True
                 ),
             )
         self.logging_on_master(f"Total scenes: {len(dataset)}")

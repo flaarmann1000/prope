@@ -60,8 +60,8 @@ class LVSMDecoderOnlyModelConfig:
     cam_shape: Tuple[int, ...] = (32, 32, 6)
     # img_shape: Tuple[int, ...] = (256, 256, 3)
     # cam_shape: Tuple[int, ...] = (256, 256, 6)
-    patch_size: int = 1
-    # patch_size: int = 8
+    # patch_size: int = 1
+    patch_size: int = 8
 
     # How the input rays are encoded.
     ray_encoding: Literal["plucker", "camray", "none", "raymap"] = "plucker"
